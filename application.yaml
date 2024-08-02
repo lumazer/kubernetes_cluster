@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd_ingress
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lumazer/kubernetes_cluster.git
+    targetRevision: HEAD
+    path: argo_cd
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
