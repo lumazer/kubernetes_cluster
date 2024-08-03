@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: online-boutique-ingress
+  namespace: online-boutique
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lumazer/kubernetes_cluster.git
+    targetRevision: HEAD
+    path: online-boutique
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: online-boutique
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
