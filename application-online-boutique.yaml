@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: online-boutique
+  namespace: online-boutique
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lumazer/microservices-demo.git
+    targetRevision: HEAD
+    path: app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: online-boutique
