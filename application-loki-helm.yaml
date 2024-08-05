@@ -15,6 +15,7 @@ spec:
       values: |-
         deploymentMode: SingleBinary
         loki:
+          auth_enabled: False
           commonConfig:
             replication_factor: 1
           storage:
