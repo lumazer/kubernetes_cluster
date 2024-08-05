@@ -3,23 +3,52 @@ kind: Application
 metadata:
   name: kube-prometheus-stack
 spec:
-  destination:
-    name: ''
-    namespace: monitoring
-    server: https://kubernetes.default.svc
+  project: default
   source:
-    path: ''
     repoURL: https://prometheus-community.github.io/helm-charts
     targetRevision: 61.7.0
-    chart: kube-prometheus-stack
     helm:
       parameters:
         - name: prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues
           value: 'false'
         - name: prometheus.prometheusSpec.podMonitorSelectorNilUsesHelmValues
           value: 'false'
-  sources: []
-  project: default
+      values: |-
+        alertmanager:
+          config:
+              global:
+                resolve_timeout: 5m
+              route:
+                group_by: ['alertname']
+                group_wait: 30s
+                group_interval: 5m
+                repeat_interval: 12h
+                receiver: mail
+                routes:
+                - receiver: mail
+                  matchers:
+                    - alertname =~ "TargetDown|KubeSchedulerDown|Watchdog"
+              receivers:
+              - name: mail
+                email_configs:
+                - to: lunohod-07@yandex.ru
+                  from: lunohod-07@yandex.ru
+                  smarthost: smtp.yandex.ru:587
+                  auth_username: lunohod-07@yandex.ru
+                  auth_identity: lunohod-07@yandex.ru
+                  auth_password: !!!CHANGEME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                  send_resolved: true
+              templates:
+              - '/etc/alertmanager/config/*.tmpl'
+        grafana:
+          additionalDataSources:
+            - name: Logging
+              type: loki
+              url: http://loki-gateway.logging.svc.cluster.local
+    chart: kube-prometheus-stack
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
