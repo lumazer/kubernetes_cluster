@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: promtail-daemonset
+  namespace: logging
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lumazer/kubernetes_cluster.git
+    targetRevision: HEAD
+    path: logging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
