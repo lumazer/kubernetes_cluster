@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: logging
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 6.7.3
+    helm:
+      parameters:
+        - name: global.dnsService
+          value: coredns
+      values: |-
+        deploymentMode: SingleBinary
+        loki:
+          commonConfig:
+            replication_factor: 1
+          storage:
+            type: 'Filesystem'
+          schemaConfig:
+            configs:
+            - from: "2024-01-01"
+              store: tsdb
+              index:
+                prefix: loki_index_
+                period: 24h
+              object_store: filesystem
+              schema: v13
+        write:
+          replicas: 0
+        read:
+          replicas: 0
+        backend:
+          replicas: 0
+        singleBinary:
+          replicas: 1
+        chunksCache:
+          allocatedMemory: 5830
+    chart: loki
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
