@@ -1,9 +1,15 @@
 # Репоз для проектной работы OTUS Kuber-2024-02
 
 Шаги предпринятые для поднятия кластера:
-1. Установка кластера через kubespray (один controlplane+worker node и два worker node).
-2. Установка argocd
-  - подклчюился к CP с пробросом порта 8080 - <code>ssh root@192.168.55.100 -L8080:127.0.0.1:8080</code>
+0. Подготовил три VM с пробросом на одну из них порта 443
+1. Установка кластера через kubespray (один controlplane+worker node и два worker node)
+  - <code>git pull https://github.com/kubernetes-sigs/kubespray.git && cd kubespray</code>
+  - <code>cp -rfp inventory/sample inventory/kubespray_k8s</code>
+  - <code>declare -a IPS=(192.168.55.100 192.168.55.101 192.168.55.102)</code>
+  - <code>CONFIG_FILE=inventory/kubespray_k8s/hosts.yaml python3 contrib/inventory_builder/inventory.py ${IPS[@]}</code>
+  - <code>ansible-playbook -i inventory/mycluster/hosts.yaml  --become --become-user=root reset.yml</code>
+3. Установка argocd
+  - подклчюился к controlplane с пробросом порта 8080 - <code>ssh root@192.168.55.100 -L8080:127.0.0.1:8080</code>
   - Создал namespace argocd - <code>kubectl create namespace argocd</code>
   - скачал yaml argocd install для HA - <code>wget https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/ha/install.yaml -O argocd_ha_install.yaml</code>
   - применил в namespace argocd - <code>kubectl apply -n argocd -f argocd_ha_install.yaml</code>
