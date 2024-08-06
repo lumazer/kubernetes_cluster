@@ -7,11 +7,20 @@ spec:
   project: default
   source:
     repoURL: https://github.com/lumazer/kubernetes_cluster.git
-    targetRevision: HEAD
     path: online-boutique
+    targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
     namespace: online-boutique
   syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
+    retry:
+      limit: 15
+      backoff:
+        duration: 60s
+        factor: 2
+        maxDuration: 15m0s
